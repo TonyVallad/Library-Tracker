@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block title %}{{ livre.titre }} — Détail{% endblock %}
+{% block content %}
+<div class="flex items-start gap-6">
+	{% if livre.lien_couverture %}
+		<img class="w-32 h-32 rounded object-cover" src="{{ url_for('static', filename='thumbs/256/' ~ livre.lien_couverture) }}" alt="{{ livre.titre }}">
+	{% else %}
+		<img class="w-32 h-32 rounded object-cover" src="{{ url_for('static', filename='img/placeholders/cover-256.png') }}" alt="Couverture indisponible">
+	{% endif %}
+	<div class="min-w-0">
+		<h1 class="text-2xl font-semibold mb-2">{{ livre.titre }}</h1>
+		<div class="text-slate-700 space-y-1">
+			{% if livre.serie %}<div>Série: <span class="font-medium">{{ livre.serie.nom }}</span> {% if livre.numero_serie %}#{{ livre.numero_serie }}{% endif %}</div>{% endif %}
+			{% if livre.editeur %}<div>Éditeur: <span class="font-medium">{{ livre.editeur.nom }}</span></div>{% endif %}
+			{% if livre.langue %}<div>Langue: <span class="font-medium">{{ livre.langue.nom }}</span></div>{% endif %}
+			{% if livre.emplacement %}<div>Emplacement: <span class="font-medium">{{ livre.emplacement.zone or '' }} C{{ livre.emplacement.colonne }} E{{ livre.emplacement.etage }}</span></div>{% endif %}
+		</div>
+		<div class="mt-4 flex gap-2">
+			<a class="inline-flex items-center rounded-md bg-slate-800 px-4 py-2 text-white hover:bg-slate-900" href="{{ url_for('catalog.edit', livre_id=livre.id) }}">Éditer</a>
+			<form method="post" action="{{ url_for('catalog.delete', livre_id=livre.id) }}">
+				<button class="inline-flex items-center rounded-md bg-rose-600 px-4 py-2 text-white hover:bg-rose-700" type="submit">Supprimer</button>
+			</form>
+		</div>
+	</div>
+</div>
+
+<h2 class="text-xl font-semibold mt-6 mb-2">Auteurs</h2>
+<form method="post" action="{{ url_for('catalog.update_authors', livre_id=livre.id) }}" class="space-y-2">
+	{% for la in livre.livre_auteurs %}
+	<div class="flex gap-2">
+		<select class="w-full rounded-md border border-slate-300 px-3 py-2" name="author_id[]">
+			<option value="">—</option>
+			{% for a in auteurs %}
+			<option value="{{ a.id }}" {% if la.auteur_id==a.id %}selected{% endif %}>{{ a.prenom or '' }} {{ a.nom }}</option>
+			{% endfor %}
+		</select>
+		<input class="w-40 rounded-md border border-slate-300 px-3 py-2" type="text" name="author_role[]" placeholder="Rôle" value="{{ la.role or '' }}">
+	</div>
+	{% endfor %}
+	<div class="flex gap-2">
+		<select class="w-full rounded-md border border-slate-300 px-3 py-2" name="author_id[]">
+			<option value="">—</option>
+			{% for a in auteurs %}
+			<option value="{{ a.id }}">{{ a.prenom or '' }} {{ a.nom }}</option>
+			{% endfor %}
+		</select>
+		<input class="w-40 rounded-md border border-slate-300 px-3 py-2" type="text" name="author_role[]" placeholder="Rôle">
+	</div>
+	<button class="inline-flex items-center rounded-md bg-emerald-600 px-4 py-2 text-white hover:bg-emerald-700" type="submit">Enregistrer</button>
+</form>
+
+<h2 class="text-xl font-semibold mt-6 mb-2">Oeuvres</h2>
+<ol class="list-decimal list-inside space-y-1">
+	{% for lo in livre.livre_oeuvres|sort(attribute='ordre') %}
+	<li>
+		{{ lo.ordre or '' }} — {{ lo.oeuvre.titre }}{% if lo.pages %} ({{ lo.pages }}){% endif %}
+	</li>
+	{% else %}
+	<li class="text-slate-600">Aucune oeuvre.</li>
+	{% endfor %}
+</ol>
+{% endblock %}

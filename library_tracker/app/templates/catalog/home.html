@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% block title %}Catalogue — Library Tracker{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-semibold mb-4">Catalogue</h1>
+<form method="get" action="{{ url_for('catalog.home') }}" class="grid grid-cols-1 md:grid-cols-6 gap-2 mb-4 items-end">
+	<input class="rounded-md border border-slate-300 px-3 py-2" type="text" name="q" placeholder="Recherche titre" value="{{ search or '' }}">
+	<input class="rounded-md border border-slate-300 px-3 py-2" type="text" name="author" placeholder="Auteur" value="{{ author_q or '' }}">
+	<select class="rounded-md border border-slate-300 px-3 py-2" name="genre_id">
+		<option value="">Genre</option>
+		{% for g in genres %}
+		<option value="{{ g.id }}" {% if selected_genre and selected_genre|int == g.id %}selected{% endif %}>{{ g.nom }}</option>
+		{% endfor %}
+	</select>
+	<select class="rounded-md border border-slate-300 px-3 py-2" name="editeur_id">
+		<option value="">Éditeur</option>
+		{% for e in editeurs %}
+		<option value="{{ e.id }}" {% if selected_editeur and selected_editeur|int == e.id %}selected{% endif %}>{{ e.nom }}</option>
+		{% endfor %}
+	</select>
+	<select class="rounded-md border border-slate-300 px-3 py-2" name="serie_id">
+		<option value="">Série</option>
+		{% for s in series %}
+		<option value="{{ s.id }}" {% if selected_serie and selected_serie|int == s.id %}selected{% endif %}>{{ s.nom }}</option>
+		{% endfor %}
+	</select>
+	<div class="md:col-span-6 grid grid-cols-1 md:grid-cols-5 gap-2">
+		<input class="rounded-md border border-slate-300 px-3 py-2" type="text" name="zone" placeholder="Zone" value="{{ zone or '' }}">
+		<input class="rounded-md border border-slate-300 px-3 py-2" type="number" name="colonne" placeholder="Colonne" value="{{ colonne or '' }}">
+		<input class="rounded-md border border-slate-300 px-3 py-2" type="text" name="etage" placeholder="Étage" value="{{ etage or '' }}">
+		<select class="rounded-md border border-slate-300 px-3 py-2" name="sort">
+			<option value="created_desc" {% if sort=='created_desc' %}selected{% endif %}>Récents d'abord</option>
+			<option value="created_asc" {% if sort=='created_asc' %}selected{% endif %}>Anciens d'abord</option>
+			<option value="title_asc" {% if sort=='title_asc' %}selected{% endif %}>Titre A→Z</option>
+			<option value="title_desc" {% if sort=='title_desc' %}selected{% endif %}>Titre Z→A</option>
+		</select>
+		<div class="flex gap-2">
+			<button class="inline-flex items-center rounded-md bg-slate-800 px-4 py-2 text-white hover:bg-slate-900" type="submit">Filtrer</button>
+			<a class="inline-flex items-center rounded-md bg-slate-600 px-4 py-2 text-white hover:bg-slate-700" href="{{ url_for('catalog.import_form') }}">Importer CSV</a>
+			<a class="inline-flex items-center rounded-md bg-emerald-600 px-4 py-2 text-white hover:bg-emerald-700" href="{{ url_for('catalog.export_csv') }}">Exporter CSV</a>
+		</div>
+	</div>
+</form>
+<p class="mb-4"><a class="inline-flex items-center rounded-md bg-emerald-600 px-4 py-2 text-white hover:bg-emerald-700" href="{{ url_for('catalog.livre_new') }}">Ajouter un livre</a></p>
+
+<div class="overflow-x-auto">
+	<table class="w-full border border-slate-200 bg-white rounded-md overflow-hidden">
+		<thead class="bg-slate-100 text-left text-sm">
+			<tr>
+				<th class="px-3 py-2">Couverture</th>
+				<th class="px-3 py-2">Titre</th>
+				<th class="px-3 py-2">Auteurs</th>
+				<th class="px-3 py-2">Série</th>
+				<th class="px-3 py-2">Genres</th>
+				<th class="px-3 py-2">Emplacement</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for livre in livres %}
+			<tr class="border-t border-slate-200">
+				<td class="px-3 py-2">
+					{% if livre.lien_couverture %}
+						<img class="w-12 h-12 rounded object-cover" src="{{ url_for('static', filename='thumbs/256/' ~ livre.lien_couverture) }}" alt="{{ livre.titre }}">
+					{% else %}
+						<img class="w-12 h-12 rounded object-cover" src="{{ url_for('static', filename='img/placeholders/cover-256.png') }}" alt="Couverture indisponible">
+					{% endif %}
+				</td>
+				<td class="px-3 py-2"><a class="font-medium hover:underline" href="{{ url_for('catalog.detail', livre_id=livre.id) }}">{{ livre.titre }}</a></td>
+				<td class="px-3 py-2 text-sm">{% for la in livre.livre_auteurs %}{{ la.auteur.prenom or '' }} {{ la.auteur.nom }}{% if la.role %} ({{ la.role }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}</td>
+				<td class="px-3 py-2 text-sm">{% if livre.serie %}{{ livre.serie.nom }}{% if livre.numero_serie %} #{{ livre.numero_serie }}{% endif %}{% else %}—{% endif %}</td>
+				<td class="px-3 py-2 text-sm">{% for g in livre.genres %}{{ g.nom }}{% if not loop.last %}, {% endif %}{% endfor %}</td>
+				<td class="px-3 py-2 text-sm">{% if livre.emplacement %}{{ livre.emplacement.zone or '' }} C{{ livre.emplacement.colonne }} E{{ livre.emplacement.etage }}{% else %}—{% endif %}</td>
+			</tr>
+			{% else %}
+			<tr><td class="px-3 py-3 text-slate-600" colspan="6">Aucun livre pour le moment.</td></tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+
+{% if pages and pages > 1 %}
+<nav class="mt-4 flex items-center justify-between text-sm">
+	<div>Page {{ page }} / {{ pages }} — {{ total }} résultats</div>
+	<div class="flex gap-2">
+		{% if prev_url %}
+		<a class="rounded-md border border-slate-300 px-3 py-1.5 hover:bg-slate-100" href="{{ prev_url }}">Précédent</a>
+		{% endif %}
+		{% if next_url %}
+		<a class="rounded-md border border-slate-300 px-3 py-1.5 hover:bg-slate-100" href="{{ next_url }}">Suivant</a>
+		{% endif %}
+	</div>
+</nav>
+{% endif %}
+{% endblock %}

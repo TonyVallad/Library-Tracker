@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Éditeurs — Library Tracker{% endblock %}
+{% block content %}
+<h1>Éditeurs</h1>
+<form method="post" action="{{ url_for('refs.editeurs_create') }}">
+	<input type="text" name="nom" placeholder="Nom" required>
+	<button type="submit">Ajouter</button>
+</form>
+<ul>
+	{% for e in items %}
+	<li>
+		{{ e.nom }}
+		<form method="post" action="{{ url_for('refs.editeurs_delete', item_id=e.id) }}" style="display:inline">
+			<button type="submit">Supprimer</button>
+		</form>
+	</li>
+	{% else %}
+	<li>Aucun éditeur.</li>
+	{% endfor %}
+</ul>
+{% endblock %}

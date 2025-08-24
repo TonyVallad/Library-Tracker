@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Langues — Library Tracker{% endblock %}
+{% block content %}
+<h1>Langues</h1>
+<form method="post" action="{{ url_for('refs.langues_create') }}">
+	<input type="text" name="nom" placeholder="Nom" required>
+	<button type="submit">Ajouter</button>
+</form>
+<ul>
+	{% for l in items %}
+	<li>
+		{{ l.nom }}
+		<form method="post" action="{{ url_for('refs.langues_delete', item_id=l.id) }}" style="display:inline">
+			<button type="submit">Supprimer</button>
+		</form>
+	</li>
+	{% else %}
+	<li>Aucune langue.</li>
+	{% endfor %}
+</ul>
+{% endblock %}

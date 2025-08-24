@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}Emplacements — Library Tracker{% endblock %}
+{% block content %}
+<h1>Emplacements</h1>
+<form method="post" action="{{ url_for('refs.emplacements_create') }}">
+	<input type="text" name="zone" placeholder="Zone">
+	<input type="number" name="colonne" placeholder="Colonne" required>
+	<input type="text" name="etage" placeholder="Étage" required>
+	<input type="text" name="description" placeholder="Description">
+	<button type="submit">Ajouter</button>
+</form>
+<ul>
+	{% for e in items %}
+	<li>
+		{{ e.zone or '' }} C{{ e.colonne }} E{{ e.etage }} {% if e.description %}— {{ e.description }}{% endif %}
+		<form method="post" action="{{ url_for('refs.emplacements_delete', item_id=e.id) }}" style="display:inline">
+			<button type="submit">Supprimer</button>
+		</form>
+	</li>
+	{% else %}
+	<li>Aucun emplacement.</li>
+	{% endfor %}
+</ul>
+{% endblock %}

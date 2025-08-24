@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block title %}Administration — Utilisateurs{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-semibold mb-4">Utilisateurs</h1>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+	<section>
+		<h2 class="text-xl font-semibold mb-2">Créer un utilisateur</h2>
+		<form method="post" action="{{ url_for('admin.create_user') }}" class="space-y-2">
+			<input class="w-full rounded-md border border-slate-300 px-3 py-2" type="text" name="username" placeholder="Nom d'utilisateur" required>
+			<input class="w-full rounded-md border border-slate-300 px-3 py-2" type="password" name="password" placeholder="Mot de passe" required>
+			<button class="inline-flex items-center rounded-md bg-emerald-600 px-4 py-2 text-white hover:bg-emerald-700" type="submit">Créer</button>
+		</form>
+	</section>
+	<section>
+		<h2 class="text-xl font-semibold mb-2">Attribuer des rôles</h2>
+		<table class="w-full border border-slate-200 bg-white rounded-md overflow-hidden">
+			<thead class="bg-slate-100">
+				<tr><th class="text-left px-3 py-2">Utilisateur</th><th class="text-left px-3 py-2">Rôles</th><th></th></tr>
+			</thead>
+			<tbody>
+				{% for u in users %}
+				<tr class="border-t border-slate-200">
+					<td class="px-3 py-2">{{ u.username }}</td>
+					<td class="px-3 py-2">
+						<form method="post" action="{{ url_for('admin.set_roles', user_id=u.id) }}" class="flex flex-wrap items-center gap-3">
+							{% for r in roles %}
+							<label class="inline-flex items-center gap-1 text-sm">
+								<input type="checkbox" name="roles[]" value="{{ r.name }}" {% if r in u.roles %}checked{% endif %}> {{ r.name }}
+							</label>
+							{% endfor %}
+							<button class="inline-flex items-center rounded-md bg-slate-800 px-3 py-1.5 text-white hover:bg-slate-900" type="submit">Enregistrer</button>
+						</form>
+					</td>
+					<td class="px-3 py-2">
+						<form method="post" action="{{ url_for('admin.reset_password', user_id=u.id) }}" class="flex items-center gap-2">
+							<input class="w-40 rounded-md border border-slate-300 px-3 py-2" type="password" name="password" placeholder="Nouveau mot de passe">
+							<button class="inline-flex items-center rounded-md bg-rose-600 px-3 py-1.5 text-white hover:bg-rose-700" type="submit">Réinitialiser</button>
+						</form>
+					</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</section>
+</div>
+{% endblock %}

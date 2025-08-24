@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% block title %}Nouveau livre — Library Tracker{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-semibold mb-4">Nouveau livre</h1>
+<form method="post" action="{{ url_for('catalog.livre_create') }}" enctype="multipart/form-data" class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl">
+	<label class="block text-sm">Titre
+		<input class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2" type="text" name="titre" required>
+	</label>
+	<label class="block text-sm">Éditeur
+		<select class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2" name="editeur_id">
+			<option value="">—</option>
+			{% for e in editeurs %}
+			<option value="{{ e.id }}">{{ e.nom }}</option>
+			{% endfor %}
+		</select>
+	</label>
+	<label class="block text-sm">Langue
+		<select class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2" name="langue_id">
+			<option value="">—</option>
+			{% for l in langues %}
+			<option value="{{ l.id }}">{{ l.nom }}</option>
+			{% endfor %}
+		</select>
+	</label>
+	<label class="block text-sm">Série
+		<select class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2" name="serie_id">
+			<option value="">—</option>
+			{% for s in series %}
+			<option value="{{ s.id }}">{{ s.nom }}</option>
+			{% endfor %}
+		</select>
+	</label>
+	<label class="block text-sm">Numéro dans la série
+		<input class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2" type="number" name="numero_serie" min="0">
+	</label>
+	<label class="block text-sm">Emplacement
+		<select class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2" name="emplacement_id">
+			<option value="">—</option>
+			{% for em in emplacements %}
+			<option value="{{ em.id }}">{{ em.zone or '' }} C{{ em.colonne }} E{{ em.etage }}</option>
+			{% endfor %}
+		</select>
+	</label>
+	<label class="block text-sm col-span-full">Couverture
+		<input class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2" type="file" name="cover" accept="image/png,image/jpeg,image/webp">
+	</label>
+
+	<div class="col-span-full">
+		<h2 class="text-xl font-semibold mb-2">Auteurs</h2>
+		<div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+			{% for i in range(2) %}
+			<div class="flex gap-2">
+				<select class="w-full rounded-md border border-slate-300 px-3 py-2" name="author_id[]">
+					<option value="">—</option>
+					{% for a in auteurs %}
+					<option value="{{ a.id }}">{{ a.prenom or '' }} {{ a.nom }}</option>
+					{% endfor %}
+				</select>
+				<input class="w-40 rounded-md border border-slate-300 px-3 py-2" type="text" name="author_role[]" placeholder="Rôle">
+			</div>
+			{% endfor %}
+		</div>
+	</div>
+
+	<div class="col-span-full">
+		<h2 class="text-xl font-semibold mb-2">Genres</h2>
+		<div class="flex flex-wrap gap-3">
+			{% for g in genres %}
+			<label class="inline-flex items-center gap-1 text-sm">
+				<input class="rounded border-slate-300" type="checkbox" name="genres[]" value="{{ g.id }}"> {{ g.nom }}
+			</label>
+			{% endfor %}
+		</div>
+	</div>
+
+	<div class="col-span-full">
+		<h2 class="text-xl font-semibold mb-2">Oeuvres</h2>
+		<div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+			<div class="flex flex-wrap gap-2">
+				<input type="hidden" name="oeuvre_id[]" value="">
+				<input class="w-64 rounded-md border border-slate-300 px-3 py-2" type="text" name="oeuvre_title[]" placeholder="Titre">
+				<input class="w-28 rounded-md border border-slate-300 px-3 py-2" type="number" name="oeuvre_ordre[]" placeholder="Ordre">
+				<input class="w-40 rounded-md border border-slate-300 px-3 py-2" type="text" name="oeuvre_pages[]" placeholder="Pages">
+			</div>
+		</div>
+	</div>
+
+	<div class="col-span-full">
+		<button class="inline-flex items-center rounded-md bg-emerald-600 px-4 py-2 text-white hover:bg-emerald-700" type="submit">Créer</button>
+	</div>
+</form>
+{% endblock %}

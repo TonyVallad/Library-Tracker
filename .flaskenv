@@ -1,0 +1,2 @@
+FLASK_APP=library_tracker.app:create_app
+FLASK_ENV=development

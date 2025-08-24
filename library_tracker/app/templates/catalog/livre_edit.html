@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% block title %}Éditer — {{ livre.titre }}{% endblock %}
+{% block content %}
+<h1>Éditer — {{ livre.titre }}</h1>
+<form method="post" action="{{ url_for('catalog.update', livre_id=livre.id) }}" enctype="multipart/form-data">
+	<label>Titre
+		<input type="text" name="titre" value="{{ livre.titre }}" required>
+	</label>
+	<label>Éditeur
+		<select name="editeur_id">
+			<option value="">—</option>
+			{% for e in editeurs %}
+			<option value="{{ e.id }}" {% if livre.editeur_id==e.id %}selected{% endif %}>{{ e.nom }}</option>
+			{% endfor %}
+		</select>
+	</label>
+	<label>Langue
+		<select name="langue_id">
+			<option value="">—</option>
+			{% for l in langues %}
+			<option value="{{ l.id }}" {% if livre.langue_id==l.id %}selected{% endif %}>{{ l.nom }}</option>
+			{% endfor %}
+		</select>
+	</label>
+	<label>Série
+		<select name="serie_id">
+			<option value="">—</option>
+			{% for s in series %}
+			<option value="{{ s.id }}" {% if livre.serie_id==s.id %}selected{% endif %}>{{ s.nom }}</option>
+			{% endfor %}
+		</select>
+	</label>
+	<label>Numéro dans la série
+		<input type="number" name="numero_serie" min="0" value="{{ livre.numero_serie or '' }}">
+	</label>
+	<label>Emplacement
+		<select name="emplacement_id">
+			<option value="">—</option>
+			{% for em in emplacements %}
+			<option value="{{ em.id }}" {% if livre.emplacement_id==em.id %}selected{% endif %}>{{ em.zone or '' }} C{{ em.colonne }} E{{ em.etage }}</option>
+			{% endfor %}
+		</select>
+	</label>
+	<label>Couverture
+		<input type="file" name="cover" accept="image/png,image/jpeg,image/webp">
+	</label>
+
+	<h2>Auteurs</h2>
+	<div id="authors">
+		{% for la in livre.livre_auteurs %}
+		<div>
+			<select name="author_id[]">
+				<option value="">—</option>
+				{% for a in auteurs %}
+				<option value="{{ a.id }}" {% if la.auteur_id==a.id %}selected{% endif %}>{{ a.prenom or '' }} {{ a.nom }}</option>
+				{% endfor %}
+			</select>
+			<input type="text" name="author_role[]" placeholder="Rôle" value="{{ la.role or '' }}">
+		</div>
+		{% endfor %}
+		<div>
+			<select name="author_id[]">
+				<option value="">—</option>
+				{% for a in auteurs %}
+				<option value="{{ a.id }}">{{ a.prenom or '' }} {{ a.nom }}</option>
+				{% endfor %}
+			</select>
+			<input type="text" name="author_role[]" placeholder="Rôle">
+		</div>
+	</div>
+
+	<h2>Genres</h2>
+	<div>
+		{% for g in genres %}
+		<label style="display:inline-block; margin-right:.5rem;">
+			<input type="checkbox" name="genres[]" value="{{ g.id }}" {% if g in livre.genres %}checked{% endif %}> {{ g.nom }}
+		</label>
+		{% endfor %}
+	</div>
+
+	<h2>Oeuvres</h2>
+	<div id="oeuvres">
+		{% for lo in livre.livre_oeuvres|sort(attribute='ordre') %}
+		<div>
+			<input type="hidden" name="oeuvre_id[]" value="{{ lo.oeuvre_id }}">
+			<input type="text" name="oeuvre_title[]" placeholder="Titre" value="{{ lo.oeuvre.titre }}">
+			<input type="number" name="oeuvre_ordre[]" placeholder="Ordre" value="{{ lo.ordre or '' }}">
+			<input type="text" name="oeuvre_pages[]" placeholder="Pages" value="{{ lo.pages or '' }}">
+		</div>
+		{% endfor %}
+		<div>
+			<input type="hidden" name="oeuvre_id[]" value="">
+			<input type="text" name="oeuvre_title[]" placeholder="Titre">
+			<input type="number" name="oeuvre_ordre[]" placeholder="Ordre">
+			<input type="text" name="oeuvre_pages[]" placeholder="Pages">
+		</div>
+	</div>
+
+	<button type="submit">Enregistrer</button>
+</form>
+{% endblock %}

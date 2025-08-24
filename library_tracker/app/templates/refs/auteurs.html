@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Auteurs — Library Tracker{% endblock %}
+{% block content %}
+<h1>Auteurs</h1>
+<form method="post" action="{{ url_for('refs.auteurs_create') }}">
+	<input type="text" name="nom" placeholder="Nom" required>
+	<input type="text" name="prenom" placeholder="Prénom">
+	<input type="text" name="alias" placeholder="Alias">
+	<button type="submit">Ajouter</button>
+</form>
+<ul>
+	{% for a in items %}
+	<li>
+		{{ a.prenom or '' }} {{ a.nom }} {% if a.alias %} ({{ a.alias }}){% endif %}
+		<form method="post" action="{{ url_for('refs.auteurs_delete', item_id=a.id) }}" style="display:inline">
+			<button type="submit">Supprimer</button>
+		</form>
+	</li>
+	{% else %}
+	<li>Aucun auteur.</li>
+	{% endfor %}
+</ul>
+{% endblock %}

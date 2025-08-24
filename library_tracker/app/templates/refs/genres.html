@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Genres — Library Tracker{% endblock %}
+{% block content %}
+<h1>Genres</h1>
+<form method="post" action="{{ url_for('refs.genres_create') }}">
+	<input type="text" name="nom" placeholder="Nom" required>
+	<button type="submit">Ajouter</button>
+</form>
+<ul>
+	{% for g in items %}
+	<li>
+		{{ g.nom }}
+		<form method="post" action="{{ url_for('refs.genres_delete', item_id=g.id) }}" style="display:inline">
+			<button type="submit">Supprimer</button>
+		</form>
+	</li>
+	{% else %}
+	<li>Aucun genre.</li>
+	{% endfor %}
+</ul>
+{% endblock %}

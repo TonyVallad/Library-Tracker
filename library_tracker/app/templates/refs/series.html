@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Séries — Library Tracker{% endblock %}
+{% block content %}
+<h1>Séries</h1>
+<form method="post" action="{{ url_for('refs.series_create') }}">
+	<input type="text" name="nom" placeholder="Nom" required>
+	<button type="submit">Ajouter</button>
+</form>
+<ul>
+	{% for s in items %}
+	<li>
+		{{ s.nom }}
+		<form method="post" action="{{ url_for('refs.series_delete', item_id=s.id) }}" style="display:inline">
+			<button type="submit">Supprimer</button>
+		</form>
+	</li>
+	{% else %}
+	<li>Aucune série.</li>
+	{% endfor %}
+</ul>
+{% endblock %}
